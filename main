@@ -1,0 +1,31 @@
+.\" Manpage for pman
+.\" Contact anasayubi7152@gmail.com to correct errors or typos.
+.TH pman 1 "27 Mar 2018" "1.0" "pman man page"
+.SH NAME
+pman \- Personal man pages
+.SH SYNOPSIS
+pman [-l] [-e COMMAND] [-r COMMAND] [--set-full-name | -n NAME] [--set-email | -m EMAIL] [--no-set-email] [--no-set-full-name] [-h] [COMMAND]
+.SH DESCRIPTION
+pman is a personal man pages tool for the system administrator. Create and view your own personal man pages.
+.SH OPTIONS
+[COMMAND] specifies the personal manual page you wish to view.
+
+	-e : edit the personal man page of a certain COMMAND via vim
+
+	-l : list all the available personal man pages made
+
+	-h : view help 
+
+	-r : remove COMMAND from personal manual pages (irreversible)
+
+	--set-full-name, -n : set the full NAME of the author. Use double quotes if the NAME contains spaces
+
+	--set-email, -m : set the EMAIL of the author
+
+	--no-set-name : remove the set name
+
+	--no-set-email : remove the set email
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Anas Ayubi (anasayubi7152@gmail.com)

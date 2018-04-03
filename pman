@@ -1,0 +1,152 @@
+#!/bin/bash
+
+WORK_DIR="/home/anasayubi/bin/pman-work-dir"
+MANS_DIR="$WORK_DIR/mans"
+
+# view main personal manual function
+view_main () {
+   man "$MANS_DIR/main"
+}
+
+# remove row and add it back again with a different field value. Used for user_details
+# example:
+### full-name: anas ayubi
+### email: abc@gmail.com
+# will can converted be converted to:
+### full-name: anas
+### email: abc@gmail.com
+ 
+remove_and_add_field () {
+if [ -e $WORK_DIR/user_details ]
+then
+   grep $1 "$WORK_DIR/user_details" --invert-match > $WORK_DIR/temp
+   rm $WORK_DIR/user_details
+   mv $WORK_DIR/temp $WORK_DIR/user_details
+fi
+   echo $1: $2 >> $WORK_DIR/user_details
+}
+
+remove_row () {
+if [ -e $WORK_DIR/user_details ]
+then
+   grep $1 "$WORK_DIR/user_details" --invert-match > $WORK_DIR/temp
+   rm $WORK_DIR/user_details
+   mv $WORK_DIR/temp $WORK_DIR/user_details
+fi
+}
+
+# for testing purposes 
+#echo WORK_DIR = $WORK_DIR
+#echo MANS_DIR = $MANS_DIR
+#echo \$1 = $1
+#echo \$2 = $2
+
+if [ $1 ]
+then
+   # List a man page
+   if [ $1 = '-l' ]
+   then
+      # List all the pman manuals 
+      ls -l --hide=main --hide=template $MANS_DIR | tail -n+2 | awk '{print $9}'
+   # Edit a man page
+   elif [ $1 = '-e'  ] 
+   then
+      # Edit a pman manual
+      if [ $2 ]
+      then
+         if [ $2 = main  ] || [ $2 = template ]
+         then
+            echo "Invalid manual name. This name is reserved for pman functionality."
+         else
+            if [ -e $MANS_DIR/$2 ]
+            then
+               # view the manual file if it already exists
+               vim $MANS_DIR/$2 
+            else
+            # if the file does not exist then import the contents from template and amend them
+               # ensure that email and full of the user are present before creating a new man page
+               if [ $(grep full-name -c $WORK_DIR/user_details) -eq 1 ] && [ $(grep email -c $WORK_DIR/user_details) -eq 1 ]              
+               then
+                  # fetch email from user_details use grep to select appropriate line and awk to format it accordingly
+                  EMAIL=$(grep email $WORK_DIR/user_details | awk '{print $2}' -)
+                  # fetch full name from user_details use grep to select appropriate line and awk to format it accordingly
+                  FULL_NAME=$(grep "full-name" user_details | awk ' { for (i = 2; i <= NF; i++) printf "%s ", $i}' -)
+                  DATE=$(date +%d-%m-%y)
+                  # Remove trailing and leading space in the variables
+                  EMAIL="$(echo -e "${EMAIL}" | tr -d '[:space:]')"
+                  FULL_NAME="$(echo -e "${FULL_NAME}" | tr -d '[:space:]')"
+                  DATE="$(echo -e "${DATE}" | tr -d '[:space:]')"
+                  # echo \$EMAIL: $EMAIL
+                  # echo \$FULL_NAME: $FULL_NAME
+                  # pipe the template text into a stream editor that substitutes text: [author-name] with the full name and etc
+                  cat $MANS_DIR/template | sed -e "s/\[author-name\]/$FULL_NAME/g" -e "s/\[author-email\]/$EMAIL/g" -e "s/\[cmd-name\]/$2/g" -e "s/\[date\]/$DATE/g" > $WORK_DIR/temp
+                  vim $MANS_DIR/$2 -c ":r $WORK_DIR/temp" 
+                  # remove temp as it is not longer required  
+                  rm $WORK_DIR/temp
+               else
+                  echo "Please set full name and email with the arguments --set-ful-name [NAME] and --set-email [EMAIL] respectively "
+               fi
+            fi
+         fi
+      else
+         echo "Please mention personal man page to edit."
+      fi
+   # View pman help
+   elif [ $1 = '-h' ]
+   then
+      view_main
+   elif [ $1 = '-r' ]
+   then
+      if [ $2 ]
+      then
+         rm $MANS_DIR/$2
+         echo OK. $2 has been deleted.
+      else
+         echo '-r requires an argument.'
+      fi
+   # Set author full name
+   elif [ $1 = '--set-full-name' ] || [ $1 = '-n' ]
+   then 
+      # [[ handles a multi word argument because a full name can have spaces on it 
+      if [[ $2 ]]
+      then
+         # Remove instance of full-name in user_details (only required when user_details is present)
+         # "$2" because $2 can be multiple words as a full name can have spaces
+         remove_and_add_field full-name "$2"
+         echo 'Full name is set.'
+      else
+         echo --set-full-name requires an argument
+      fi
+   # remove email
+   elif [ $1 = '--no-set-email' ]
+   then
+      remove_row email
+      echo 'Email removed.'   
+   # remove name
+   elif [ $1 = '--no-set-name' ]
+   then
+      remove_row name
+      echo 'Name removed.'   
+   # Set author email 
+   elif [ $1 = '--set-email' ] || [ $1 = '-m' ]
+   then 
+      if [ $2 ]
+      then
+         # Remove instance of email in user_details (only required when user_details is present)
+         remove_and_add_field email $2
+         echo 'Email is set.'
+      else
+         echo --set-email requires an argument
+      fi
+   # View if the personal man page exists
+   elif [ -e $MANS_DIR/$1 ]
+   then
+      man $MANS_DIR/$1
+   # Show a manual
+   else
+      echo "Incorrect command. Please type pman or pman -h to view help documentation." 
+   fi
+else
+   view_main
+fi
+

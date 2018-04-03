@@ -1,0 +1,9 @@
+.\" Guide for [cmd-name]
+.\" Contact [author-name] to correct errors or typos.
+.TH pman 1 [date] "1.0" "[cmd-name] personal man page"
+.SH NAME
+[cmd-name]
+.SH GUIDE
+	[Details]
+.SH AUTHOR
+[author-name] ([author-email])
