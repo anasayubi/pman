@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORK_DIR="/home/anasayubi/bin/pman-work-dir"
+WORK_DIR="$HOME/bin/pman-work-dir"
 MANS_DIR="$WORK_DIR/mans"
 
 # view main personal manual function
