@@ -67,11 +67,11 @@ then
                # ensure that email and full of the user are present before creating a new man page
                if [ $(grep full-name -c $WORK_DIR/user_details) -eq 1 ] && [ $(grep email -c $WORK_DIR/user_details) -eq 1 ]              
                then
-                  echo 'inside1'
+                  # echo 'inside1'
                   # fetch email from user_details use grep to select appropriate line and awk to format it accordingly
                   EMAIL=$(grep email $WORK_DIR/user_details | awk '{print $2}' -)
                   # fetch full name from user_details use grep to select appropriate line and awk to format it accordingly
-                  FULL_NAME=$(grep "full-name" user_details | awk '{ for (i = 2; i <= NF; i++) printf "%s ", $i}' -)
+                  FULL_NAME=$(grep full-name $WORK_DIR/user_details | awk '{ for (i = 2; i <= NF; i++) printf "%s ", $i}' -)
                   DATE=$(date +%d-%m-%y)
                   # Remove trailing and leading space in the variables
                   EMAIL="$(echo -e "${EMAIL}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
