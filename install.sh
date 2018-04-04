@@ -30,6 +30,7 @@ cp pman $INSTALL_LOC
 mkdir $INSTALL_LOC/pman-work-dir
 mkdir $INSTALL_LOC/pman-work-dir/mans
 cp main template $INSTALL_LOC/pman-work-dir/mans
+touch $INSTALL_LOC/pman-work-dir/user_details 
 
 # if PATH does not contain then add to PATH
 #echo PATH
